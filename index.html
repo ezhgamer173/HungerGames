@@ -6,21 +6,34 @@
   <meta name="viewport" content="width=device-width">
   <title>Hunger Games</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
-  <link href="../bootstrap.css" rel="stylesheet" type="text/css" />
+  <link href="/bootstrap.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body class="bg-dark text-light" onload="document.getElementById('addPlayerButton').click();document.getElementById('addPlayerButton').click();">
   <div id="options">
     <h2>Players</h2>
     <template id="playerTemplate">
-      <span>
+      <span class="playerField">
         <p class="playerP">
           <input type="text" class="playerInput" maxlength="30" placeholder="Name">
           <select class="playerInput">
+            <option disabled selected>Pronoun</option>
             <option>Generic</option>
             <option>Male</option>
             <option>Female</option>
             <option>Object</option>
+          </select>
+          <select class="playerInput">
+            <option disabled selected>Primary Ability</option>
+            <option>Strength</option>
+            <option>Dexterity</option>
+            <option>Intelligence</option>
+          </select>
+          <select class="playerInput">
+            <option disabled selected>Secondary Ability</option>
+            <option>Strength</option>
+            <option>Dexterity</option>
+            <option>Intelligence</option>
           </select>
           <!-- hello -->
           &emsp;
@@ -31,15 +44,28 @@
         <br>
       </span>
     </template>
+    <div id="playerFieldWrapper">
     <div id="playerField">
       
     </div>
-    <button id="addPlayerButton" class="btn btn-outline-light" onclick='this.previousElementSibling.appendChild(document.getElementById("playerTemplate").content.cloneNode(true));'>Add Player</button><br>
+    <button id="addPlayerButton" class="btn btn-outline-light" onclick='if (this.previousElementSibling.children.length % 2) {this.previousElementSibling.appendChild(document.getElementById("playerTemplate").content.cloneNode(true));} else {this.previousElementSibling.insertBefore(document.getElementById("playerTemplate").content.cloneNode(true),this.previousElementSibling.children[Math.ceil(this.previousElementSibling.children.length / 2)]);}'>Add Player</button><button onclick="load()" class="btn btn-outline-light">Load</button><button onclick="save()" class="btn btn-outline-light">Save</button><button onclick="erase()" class="btn btn-outline-light">Erase Save</button></div>
+    <div id="gamemakerActions">
+      <div id="gamemakerActionsActual">
+        <button onclick="badEvent()" class="btn btn-outline-light" id="badEventButton">Cause Bad Event Tomorrow</button>
+        <br>
+        <button id="lowerMapSizeButton" onclick="lowerMapSize()" class="btn btn-outline-light">Lower Map Radius to 7</button>
+      </div>
+      <div id="playersStatus">
+        
+      </div>
+    </div>
+    <br>
     <button class="btn btn-outline-light" id="mainButton" onclick="start();">Start</button>
   </div>
   <div id="outputWrapper">
     <p id="output"></p>
   </div>
+  
   <script src="data.js"></script>
   <script src="game.js"></script>
   <script src="script.js"></script>

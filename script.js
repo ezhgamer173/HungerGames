@@ -18,9 +18,8 @@ String.prototype.format = function() {
   // }
   return final;
 }
-Array.prototype.print = function() {
-  for (const a of this) {print(a);}
-}
+Object.defineProperty(Object.prototype, 'print', {value: function() {for (const a of this) {print(a);}}});
+
 function print(a) {
   const added = document.createElement("span");
   added.innerHTML = a;
@@ -33,40 +32,119 @@ function clear() {
 function modal(string) {
   alert(string);
 }
-
-function displayLogs(day=-1) {
+function updateStatus() {
+  document.getElementById("playersStatus").innerHTML = "";
   for (player of players) {
-    print(player.name);
-    print("<span class='indented'>" + player.log.map(o=>`Day ${o.day}: ${o.log}`).join("<br>").format(player) + "</span>")
+  document.getElementById("playersStatus").innerHTML += `<p>${player.status}</p>`;
+  }
+}
+function displayLogs(day2=-1) {
+  for (player of players) {
+    if (day2 === -1) {
+      print(player.name);
+      print("<span class='indented'>" + player.log.filter(o=>o.day>0).map(o=>`Day ${o.day}: ${o.log}`).join("<br>").format(player) + "</span>");}
+    else {
+      if (player.dayDead < day2 && player.dayDead !== -1) {continue;}
+      print(player.name);
+      print("<span class='indented'>" + player.log.filter(o=>(o.day===day2)).map(o=>`Day ${o.day}: ${o.log}`).join("<br>").format(player) + "</span>");
+    }
   }
 }
 function addPlayers() {
   players = [];
   for (const element of document.getElementById("playerField").children) {
-    players.push(new Player(element.firstElementChild.firstElementChild.value,element.firstElementChild.firstElementChild.nextElementSibling.value[0].toLowerCase(),players.length));
+    let final = [0,0,0];
+    final[{"Intelligence":2,"Strength":1,"Dexterity":0}[element.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.value]] += 4;
+    final[{"Intelligence":2,"Strength":1,"Dexterity":0}[element.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling.value]] += 2;
+    players.push(new Player(element.firstElementChild.firstElementChild.value,element.firstElementChild.firstElementChild.nextElementSibling.value[0].toLowerCase(),players.length,final));
+  }
+  aliveNumber = players.length;
+}
+function setCookie(name,value) {
+  localStorage.setItem(name, value);
+}
+function getCookie(name) {
+  return localStorage.getItem(name)||"[]";
+}
+function eraseCookie(name) {   
+  localStorage.removeItem(name);
+}
+function save() {
+  const name = prompt("What name to save as?");
+  const final = [];
+  let playerN = 0;
+  for (const field of document.getElementById("playerField").children) {
+    playerN++
+    final.push({name:field.firstElementChild.firstElementChild.value,pronoun:field.firstElementChild.firstElementChild.nextElementSibling.value,primary:field.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.value,secondary:field.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling.value,});
+  }
+  setCookie(name,JSON.stringify(final));
+  const w = JSON.parse(getCookie("list_of_saves"));
+  w.push(name);
+  setCookie("list_of_saves",JSON.stringify(w));
+}
+function erase() {
+  const name = prompt("What name to erase? You have:\n"+JSON.parse(getCookie("list_of_saves")).join("\n"));
+  eraseCookie(name);
+  const w = JSON.parse(getCookie("list_of_saves"));
+  if (w.includes(name)) {
+    w.splice(w.indexOf(name),1);
+    setCookie("list_of_saves",JSON.stringify(w));
+  }
+}
+function load() {
+  const name = prompt("What name to get? You have:\n"+JSON.parse(getCookie("list_of_saves")).join("\n"));
+  const final = JSON.parse(getCookie(name));
+  let n = 0;
+  const k = document.getElementById("playerField");
+  k.innerHTML = "";
+  for (const field of final) document.getElementById('addPlayerButton').click();
+  for (const field of final) {
+    
+    const f = k.children[n].firstElementChild.firstElementChild;
+    console.log(f);
+    f.value = field.name;
+    f.nextElementSibling.value = field.pronoun;
+    f.nextElementSibling.nextElementSibling.value = field.primary;
+    f.nextElementSibling.nextElementSibling.nextElementSibling.value = field.secondary;
+    n++;
   }
 }
 function start() {
   if (document.getElementById("mainButton").innerHTML == "Start") {
+    clear();
     addPlayers();
     if (players.length < 2) {
       return false;
     }
     day = 0;
-    document.getElementById("mainButton").innerHTML = "Next Day";
-  } else {day++;resolveDay();}
+    document.getElementById("mainButton").innerHTML = "Begin!";
+    document.getElementById("playerFieldWrapper").style.display = "none";
+    document.getElementById("gamemakerActions").style.display = "inline-block";
+    start();
+  } else {document.getElementById("mainButton").innerHTML = "Next Day";document.getElementById("badEventButton").innerHTML = "Cause Bad Event Tomorrow";day++;resolveDay();}
 }
 
 function gameOver(player) {
-  alert(player.name + " won!");
+  print(player.name + " won!");
   document.getElementById("mainButton").innerHTML = "Start";
+  document.getElementById("playerFieldWrapper").style.display = "inline-block";
+  document.getElementById("gamemakerActions").style.display = "none";
   displayLogs();
 }
 
 // Gamemaker actions
 function lowerMapSize() {
-  settings.mapRadius--;
+  document.getElementById("lowerMapSizeButton").innerHTML = `Lower Map Radius to ${--settings.mapRadius - 1}`;
   for (player of players) {
     (player.health > 0) && (player.distance = Math.min(player.distance,settings.mapRadius));
+  }
+}
+function badEvent() {
+  if (BAD_EVENT === false) {
+    BAD_EVENT = Math.floor(Math.random()*data.randomEvents.length);
+    document.getElementById("badEventButton").innerHTML = "Cancel Bad Event";
+  } else {
+    BAD_EVENT = false;
+    document.getElementById("badEventButton").innerHTML = "Cause Bad Event Tomorrow";
   }
 }
