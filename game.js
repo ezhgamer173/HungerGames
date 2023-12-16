@@ -83,7 +83,6 @@ class Player {
       }
     }
     if (consume && this.weapons[finalWeapon] && this.weapons[finalWeapon].ammunition !== -1) this.weapons[finalWeapon].ammunition--;
-    if (consume) console.log(finalWeapon,final);
     return [final,finalWeapon,finalS];
   }
   forageAmount() {
@@ -168,7 +167,7 @@ class Player {
     let message = messageOG;
     let max = 0;let m="";let p;for (const key in this.damages) {if ((p=this.damages[key])>max) {m=key;max=p}}
     if (m !== type) {
-      console.log(m);
+
       message = message.replace("{name}",`{name}, ${weakenedMessages[m]},`);
     }
     this.__deathMessage = message;
@@ -178,7 +177,6 @@ class Player {
   
     this.health -= amount;
     if (battle) this.addCondition("bleeding",amount);
-    console.log(amount);
     const key = battle?"battle":type;
     if (key in this.damages) this.damages[key] += amount;
     else this.damages[key] = amount;
@@ -336,14 +334,18 @@ function resolveDay() {
     BAD_EVENT = false;
   events = shuffle(events);
   for (const event of events) {
-    event.resolve();
     const alive = players.filter(o=>o.health>0);
-    if (alive.length == 1) {
-      console.log(players);
-
-      gameOver(alive[0]);
+    const healths = alive.map(o=>o.health);
+    event.resolve();
+    const alive2 = players.filter(o=>o.health>0);
+    if (alive2.length == 1) {
+      gameOver(alive2[0]);
+      return;
+    } else if (alive2.length == 0) {
+      gameOver(alive[healths.indexOf(Math.max(...healths))]);
       return;
     }
+    
   }
   const alive = players.filter(o=>o.health>0);
   const healths = alive.map(o=>o.health);

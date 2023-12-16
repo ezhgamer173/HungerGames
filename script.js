@@ -61,13 +61,17 @@ function addPlayers() {
   aliveNumber = players.length;
 }
 function setCookie(name,value) {
-  localStorage.setItem(name, value);
+  const prev = JSON.parse(localStorage.getItem("hungerGames") || "{}");
+  prev[name] = value;
+  localStorage.setItem("hungerGames", JSON.stringify(prev));
 }
 function getCookie(name) {
-  return localStorage.getItem(name)||"[]";
+  return JSON.parse(localStorage.getItem("hungerGames") || "{}")[name];
 }
 function eraseCookie(name) {   
-  localStorage.removeItem(name);
+  const prev = JSON.parse(localStorage.getItem("hungerGames"));
+  if (name in prev) delete prev[name];
+  localStorage.setItem("hungerGames", JSON.stringify(prev));
 }
 function save() {
   const name = prompt("What name to save as?");
@@ -78,8 +82,8 @@ function save() {
     final.push({name:field.firstElementChild.firstElementChild.value,pronoun:field.firstElementChild.firstElementChild.nextElementSibling.value,primary:field.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.value,secondary:field.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling.value,});
   }
   setCookie(name,JSON.stringify(final));
-  const w = JSON.parse(getCookie("list_of_saves"));
-  w.push(name);
+  const w = JSON.parse(getCookie("list_of_saves")) || [];
+  if (!w.includes(name)) w.push(name);
   setCookie("list_of_saves",JSON.stringify(w));
 }
 function erase() {
@@ -117,6 +121,8 @@ function start() {
       return false;
     }
     day = 0;
+    settings.mapRadius = 8;
+    document.getElementById("lowerMapSizeButton").innerHTML = `Lower Map Radius to ${settings.mapRadius - 1}`;
     document.getElementById("mainButton").innerHTML = "Begin!";
     document.getElementById("playerFieldWrapper").style.display = "none";
     document.getElementById("gamemakerActions").style.display = "inline-block";

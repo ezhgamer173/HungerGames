@@ -5,6 +5,13 @@ const deathMessages = {
   starving:"{name} starves to death",
   dehydration:"{name} dies of dehydration"
 }
+const almostDeathMessages = {
+  bleeding:"{name} almost bleeds to death from {possessive} wounds",
+  burned:"{name} almost dies of {possessive} burns",
+  exposure:"{name} almost dies of exposure",
+  starving:"{name} almost starves to death",
+  dehydration:"{name} almost dies of dehydration"
+}
 const weakenedMessages = {
   bleeding:"weakened by bleeding out",
   burned:"heavily burned",
