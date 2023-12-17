@@ -66,7 +66,7 @@ function setCookie(name,value) {
   localStorage.setItem("hungerGames", JSON.stringify(prev));
 }
 function getCookie(name) {
-  return JSON.parse(localStorage.getItem("hungerGames") || "{}")[name];
+  return JSON.parse(localStorage.getItem("hungerGames") || "{}")[name] || [];
 }
 function eraseCookie(name) {   
   const prev = JSON.parse(localStorage.getItem("hungerGames"));
