@@ -163,15 +163,15 @@ class Player {
         break;
     }
   }
-  deathMessage(messageOG,type) {
+  deathMessage(messageOG,type,extra) {
     let message = messageOG;
     let max = 0;let m="";let p;for (const key in this.damages) {if ((p=this.damages[key])>max) {m=key;max=p}}
     if (m !== type) {
 
       message = message.replace("{name}",`{name}, ${weakenedMessages[m]},`);
     }
-    this.__deathMessage = message;
-    this.log.push({day:day,log:message})
+    this.__deathMessage = (extra?extra:type);
+    this.log.push({day:day,log:message,death:true})
   }
   damage(amount, type, battle=false) {
   
@@ -186,7 +186,7 @@ class Player {
       this.dead = true;
       this.dayDead = day;
       if (battle) {
-        this.deathMessage(`{name} is killed in battle by ${type.player} with ${type.weapon}`,"battle");
+        this.deathMessage(`{name} is killed in battle by ${type.player} with ${type.weapon}`,"battle",type);
       } else {
         this.deathMessage(deathMessages[type],type);
       }
@@ -243,7 +243,7 @@ class Event {
       this.player.resources.food += this.data[1];
       this.player.resources.water += this.data[2];
       if (this.data[3]) this.player.addWeapon(this.data[3]);
-      this.player.log.push({day:day,log:`{name} forages and finds ${this.data[1]} food, ${this.data[2]} water, and ${this.data[0]} random` + ((this.data[3])?`. {cap}{subject} also finds ${this.data[3]}`:"")});
+      this.player.log.push({day:day,log:`{name} forages and finds ${choose(data.foods[this.data[1]])}, ${data.water[this.data[2]]}, and ${choose(data.random[this.data[0]])}` + ((this.data[3])?`. {cap}{subject} also finds ${this.data[3]}`:"")});
     }
     else if (this.type === "shelter") {
       // this.data = Math.floor(Math.random()*3);
@@ -278,6 +278,11 @@ class Event {
     }
     else if (this.type === "fight") {
       this.data = this.player.fight(this.player2);
+      if (!this.player.dead && this.player2.dead) {
+        
+      } else if (!this.player2.dead && this.player.dead) {
+        this.
+      }
       // this.player.log.push({day:day,log:(`{name} fights ${this.player2.nameDisplay} and ` + (this.data[0]?`takes ${this.data[0]} damage`:"emerges unscathed"))});
       // this.player2.log.push({day:day,log:(`{name} fights ${this.player.nameDisplay} and ` + (this.data[1]?`takes ${this.data[1]} damage`:"emerges unscathed"))});
     }
