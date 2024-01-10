@@ -279,9 +279,11 @@ class Event {
     else if (this.type === "fight") {
       this.data = this.player.fight(this.player2);
       if (!this.player.dead && this.player2.dead) {
-        
+        this.player.loot(this.player2);
+        this.player.log.push({day:day,log:`{name} loots ${this.player2.nameDisplay}'s corpse'`});
       } else if (!this.player2.dead && this.player.dead) {
-        this.
+        this.player2.loot(this.player);
+        this.player2.log.push({day:day,log:`{name} loots ${this.player.nameDisplay}'s corpse'`});
       }
       // this.player.log.push({day:day,log:(`{name} fights ${this.player2.nameDisplay} and ` + (this.data[0]?`takes ${this.data[0]} damage`:"emerges unscathed"))});
       // this.player2.log.push({day:day,log:(`{name} fights ${this.player.nameDisplay} and ` + (this.data[1]?`takes ${this.data[1]} damage`:"emerges unscathed"))});
