@@ -53,12 +53,18 @@ function displayLogs(day2=-1) {
 function addPlayers() {
   players = [];
   for (const element of document.getElementById("playerField").children) {
+    if (element.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.value != "Primary Ability" && element.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling.value != "Secondary Ability" && element.firstElementChild.firstElementChild.nextElementSibling.value[0].toLowerCase() != "p") {
     let final = [0,0,0];
     final[{"Intelligence":2,"Strength":1,"Dexterity":0}[element.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.value]] += 4;
     final[{"Intelligence":2,"Strength":1,"Dexterity":0}[element.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling.value]] += 2;
     players.push(new Player(element.firstElementChild.firstElementChild.value,element.firstElementChild.firstElementChild.nextElementSibling.value[0].toLowerCase(),players.length,final));
+    } else {
+      alert("Please select something for every field.");
+      return false;
+    }
   }
   aliveNumber = players.length;
+  return true;
 }
 function setCookie(name,value) {
   const prev = JSON.parse(localStorage.getItem("hungerGames") || "{}");
@@ -103,7 +109,7 @@ function load() {
   k.innerHTML = "";
   for (const field of final) document.getElementById('addPlayerButton').click();
   for (const field of final) {
-    
+
     const f = k.children[n].firstElementChild.firstElementChild;
     console.log(f);
     f.value = field.name;
@@ -116,8 +122,9 @@ function load() {
 function start() {
   if (document.getElementById("mainButton").innerHTML == "Start") {
     clear();
-    addPlayers();
+    if (addPlayers()) {
     if (players.length < 2) {
+      alert("You need at least 2 players to play.")
       return false;
     }
     day = 0;
@@ -127,6 +134,7 @@ function start() {
     document.getElementById("playerFieldWrapper").style.display = "none";
     document.getElementById("gamemakerActions").style.display = "inline-block";
     start();
+  }
   } else {document.getElementById("mainButton").innerHTML = "Next Day";document.getElementById("badEventButton").innerHTML = "Cause Bad Event Tomorrow";day++;resolveDay();}
 }
 
