@@ -42,11 +42,11 @@ function displayLogs(day2=-1) {
   for (player of players) {
     if (day2 === -1) {
       print(player.name);
-      print("<span class='indented'>" + player.log.filter(o=>o.day>0).map(o=>`Day ${o.day}: ${o.log}`).join("<br>").format(player) + "</span>");}
+      print("<span class='indented'><table>" + player.log.filter(o=>o.day>0).map(o=>`<tr><td>Day ${o.day}: </td><td>${o.log}</td></tr>`).join("").format(player) + "</table></span>");}
     else {
       if (player.dayDead < day2 && player.dayDead !== -1) {continue;}
       print(player.name);
-      print("<span class='indented'>" + player.log.filter(o=>(o.day===day2)).map(o=>`Day ${o.day}: ${o.log}`).join("<br>").format(player) + "</span>");
+      print("<span class='indented'><table>" + player.log.filter(o=>(o.day===day2)).map(o=>`<tr><td>Day ${o.day}: </td><td>${o.log}</td></tr>`).join("").format(player) + "</table></span>");
     }
   }
 }
