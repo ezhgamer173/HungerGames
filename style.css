@@ -5,7 +5,9 @@ html {
 }
 #outputWrapper {
   z-index:-5;
-  width:50%;
+  width:100%;
+}
+#output {
 }
 #options {
   text-align:center;
@@ -49,9 +51,21 @@ select.playerInput {
 .playerName {
   cursor:pointer;
 }
-.indented {
+#logs {
+  column-count:2;
+  width:100%;
+  height:100%;
+}
+.playerLog {
+  width:100%;
+  
+  display:block;
+
+}
+.playerLog table {
+  width:100%;
   display:inline-block;
-  margin-left:1em;
+  padding-left:1em;
 }
 td:nth-child(odd) {
   width:10%;

@@ -39,16 +39,23 @@ function updateStatus() {
   }
 }
 function displayLogs(day2=-1) {
+  let string = "";
+  string += ("<div id='logs'>");
   for (player of players) {
     if (day2 === -1) {
-      print(player.name);
-      print("<span class='indented'><table>" + player.log.filter(o=>o.day>0).map(o=>`<tr><td>Day ${o.day}: </td><td>${o.log}</td></tr>`).join("").format(player) + "</table></span>");}
+      string += ("<span class='playerLog'>");
+      string += (player.name+"<br>");
+      string += ("<table>" + player.log.filter(o=>o.day>0).map(o=>`<tr><td>Day ${o.day}: &emsp;</td><td>${o.log}</td></tr>`).join("").format(player) + "</table></span>");
+    }
     else {
       if (player.dayDead < day2 && player.dayDead !== -1) {continue;}
-      print(player.name);
-      print("<span class='indented'><table>" + player.log.filter(o=>(o.day===day2)).map(o=>`<tr><td>Day ${o.day}: </td><td>${o.log}</td></tr>`).join("").format(player) + "</table></span>");
+      string += ("<span class='playerLog'>");
+      string += (player.name+"<br>");
+      string += ("<table>" + player.log.filter(o=>(o.day===day2)).map(o=>`<tr><td>Day ${o.day}: &emsp;</td><td>${o.log}</td></tr>`).join("").format(player) + "</table></span>");
     }
   }
+  string += ("</div>");
+    document.getElementById("output").innerHTML += (string);
 }
 function addPlayers() {
   players = [];
@@ -57,6 +64,7 @@ function addPlayers() {
     let final = [0,0,0];
     final[{"Intelligence":2,"Strength":1,"Dexterity":0}[element.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.value]] += 4;
     final[{"Intelligence":2,"Strength":1,"Dexterity":0}[element.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.nextElementSibling.value]] += 2;
+      final[2] = final[2]/2 + 1;
     players.push(new Player(element.firstElementChild.firstElementChild.value,element.firstElementChild.firstElementChild.nextElementSibling.value[0].toLowerCase(),players.length,final));
     } else {
       alert("Please select something for every field.");
@@ -130,6 +138,7 @@ function start() {
     day = 0;
     settings.mapRadius = 8;
     document.getElementById("lowerMapSizeButton").innerHTML = `Lower Map Radius to ${settings.mapRadius - 1}`;
+      document.getElementById("lowerMapSizeButton").disabled = false;
     document.getElementById("mainButton").innerHTML = "Begin!";
     document.getElementById("playerFieldWrapper").style.display = "none";
     document.getElementById("gamemakerActions").style.display = "inline-block";
@@ -138,17 +147,28 @@ function start() {
   } else {document.getElementById("mainButton").innerHTML = "Next Day";document.getElementById("badEventButton").innerHTML = "Cause Bad Event Tomorrow";day++;resolveDay();}
 }
 
-function gameOver(player) {
-  print(player.name + " won!");
+function gameOver(player,died=false) {
+  print("<center><h1 class='text-light'>"+player.name + " won!</h1></center>");
   document.getElementById("mainButton").innerHTML = "Start";
   document.getElementById("playerFieldWrapper").style.display = "inline-block";
   document.getElementById("gamemakerActions").style.display = "none";
+  if (died) {
+    player.log.pop();
+    player.log.push({day:day,log:(player.__deathMessage in almostDeathMessages?almostDeathMessages[player.__deathMessage]:`{name} is almost killed by ${player.__deathMessage.player} with ${player.__deathMessage.weapon}`)+", but is pulled out of the arena as the victor"});
+  }
   displayLogs();
 }
 
 // Gamemaker actions
 function lowerMapSize() {
-  document.getElementById("lowerMapSizeButton").innerHTML = `Lower Map Radius to ${--settings.mapRadius - 1}`;
+  --settings.mapRadius;
+  if (settings.mapRadius>1) {
+    document.getElementById("lowerMapSizeButton").innerHTML = `Lower Map Radius to ${settings.mapRadius - 1}`;
+  }
+  else {
+    document.getElementById("lowerMapSizeButton").innerHTML = `Map Radius already at 1`;
+    document.getElementById("lowerMapSizeButton").disabled = true;
+  }
   for (player of players) {
     (player.health > 0) && (player.distance = Math.min(player.distance,settings.mapRadius));
   }

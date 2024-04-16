@@ -173,7 +173,7 @@ class Player {
     this.__deathMessage = (extra?extra:type);
     this.log.push({day:day,log:message,death:true})
   }
-  damage(amount, type, battle=false) {
+  damage(amount, type, battle=false, kill=false) {
 
     this.health -= amount;
     if (battle) this.addCondition("bleeding",amount);
@@ -190,10 +190,13 @@ class Player {
       } else {
         this.deathMessage(deathMessages[type],type);
       }
+      return true;
     } else {
       if (battle) {
-        this.log.push({log:`{name} is wounded by ${type.player} with ${type.weapon}`,day:day});
+        let battleLog = `{name} is wounded by ${type.player} with ${type.weapon}`;
+        this.log.push({log:battleLog,day:day});
       }
+      return false;
     }
   }
   fight(other,isOther=false) {
@@ -201,8 +204,8 @@ class Player {
     let crit = false;
     if (Math.floor(Math.random()*(speed1-other.int)) > 0) {damage1 *= 2;crit=true;}
     other.damage(damage1,{player:this.nameDisplay,weapon:weapon1},true);
-    if (!isOther) {return [damage1,other.fight(this,isOther=true)];}
-    return damage1;
+    if (!isOther) {return [[damage1,weapon1,speed1],other.fight(this,isOther=true)];}
+    return [damage1,weapon1,speed1];
   }
   loot(other) {
     this.resources.food += Math.max(0,other.resources.food - day + other.dayDead);
@@ -280,9 +283,11 @@ class Event {
       this.data = this.player.fight(this.player2);
       if (!this.player.dead && this.player2.dead) {
         this.player.loot(this.player2);
+        this.player.log[this.player.log.length-1].log += `, but kills ${this.player2.pronouns.object} with ${this.data[0][1]}`;
         this.player.log.push({day:day,log:`{name} loots ${this.player2.nameDisplay}'s corpse`});
       } else if (!this.player2.dead && this.player.dead) {
         this.player2.loot(this.player);
+        this.player2.log[this.player2.log.length-1].log += `, but kills ${this.player.pronouns.object} with ${this.data[1][1]}`;
         this.player2.log.push({day:day,log:`{name} loots ${this.player.nameDisplay}'s corpse`});
       }
       // this.player.log.push({day:day,log:(`{name} fights ${this.player2.nameDisplay} and ` + (this.data[0]?`takes ${this.data[0]} damage`:"emerges unscathed"))});
@@ -349,7 +354,7 @@ function resolveDay() {
       gameOver(alive2[0]);
       return;
     } else if (alive2.length == 0) {
-      gameOver(alive[healths.indexOf(Math.max(...healths))]);
+      gameOver(alive[healths.indexOf(Math.max(...healths))],died=true);
       return;
     }
 
@@ -361,7 +366,7 @@ function resolveDay() {
   if (alive2.length == 1) {
     gameOver(alive2[0]);
   } else if (alive2.length == 0) {
-    gameOver(alive[healths.indexOf(Math.max(...healths))]);
+    gameOver(alive[healths.indexOf(Math.max(...healths))],died=true);
   } else {
     displayLogs(day);
   }
