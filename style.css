@@ -67,8 +67,12 @@ select.playerInput {
   display:inline-block;
   padding-left:1em;
 }
+.playerLog table * {
+  border:red dotted 1px;
+}
 td:nth-child(odd) {
   width:10%;
+  text-wrap:nowrap;
 }
 #gamemakerActions {
   display: none;
