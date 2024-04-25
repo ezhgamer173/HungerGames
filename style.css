@@ -13,7 +13,7 @@ html {
   text-align:center;
 }
 #playerField {
-  columns:2;
+  /* columns:2; */
   
 }
 .playerP {
@@ -85,7 +85,15 @@ td:nth-child(odd) {
   /* background-color: red; */
 }
 #playersStatus {
-
+  columns:2;
+  width:100vw;
+  text-align:left;
+}
+#playersStatus div {
+  columns:1;
+  display:block;
+  text-align:left;
+  width:100%;
 }
 #gamemakerActionsActual {
   display:inline-block;
